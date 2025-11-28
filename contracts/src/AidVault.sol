@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import '../lib/reactive-lib/src/abstract-base/AbstractCallback.sol';
+
 /**
  * @title AidVault
  * @notice Destination contract that receives callbacks and distributes emergency aid
  * @dev Deployed on Optimism Sepolia - receives callbacks from Reactive Network
+ * Uses AbstractCallback from reactive-lib for proper callback authorization
  */
-contract AidVault {
+contract AidVault is AbstractCallback {
     event AidDistributed(
         uint8 indexed disasterType,
         uint256 severity,
@@ -16,12 +19,10 @@ contract AidVault {
         address indexed recipient
     );
 
-    mapping(address => bool) public authorizedCallers;
     mapping(string => uint256) public locationFunds;
     uint256 public totalDistributed;
 
-    constructor(address _callbackProxy) {
-        authorizedCallers[_callbackProxy] = true;
+    constructor(address _callbackProxy) AbstractCallback(_callbackProxy) {
     }
 
     function distributeAid(
@@ -29,8 +30,7 @@ contract AidVault {
         uint256 severity,
         string memory location,
         uint8 responseLevel
-    ) external {
-        require(authorizedCallers[msg.sender], "AidVault: unauthorized");
+    ) external authorizedSenderOnly {
         
         uint256 amount = _calculateAidAmount(severity, responseLevel);
         locationFunds[location] += amount;
@@ -51,10 +51,6 @@ contract AidVault {
         uint8 level
     ) private pure returns (uint256) {
         return severity * (level + 1) * 1e18;
-    }
-
-    function addAuthorizedCaller(address _caller) external {
-        authorizedCallers[_caller] = true;
     }
 }
 

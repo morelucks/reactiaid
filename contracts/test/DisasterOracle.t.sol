@@ -6,6 +6,7 @@ import {DisasterOracle} from "../src/DisasterOracle.sol";
 
 contract DisasterOracleTest is Test {
     DisasterOracle public oracle;
+    address public deployer = address(this);
     address public authorized = address(0x1);
     address public unauthorized = address(0x2);
 
@@ -14,25 +15,28 @@ contract DisasterOracleTest is Test {
     }
 
     function test_TriggerDisaster() public {
-        vm.prank(authorized);
-        oracle.addAuthorized(authorized);
-        
+        // Deployer is already authorized, use deployer
         vm.expectEmit(true, true, false, true);
         emit DisasterOracle.DisasterDeclared(
             1, // flood
             5, // severity
             "New York",
             block.timestamp,
-            authorized
+            deployer
         );
         
-        vm.prank(authorized);
         oracle.triggerDisaster(1, 5, "New York");
     }
 
     function test_UnauthorizedCannotTrigger() public {
         vm.expectRevert("DisasterOracle: not authorized");
+        vm.prank(unauthorized);
         oracle.triggerDisaster(1, 5, "New York");
+    }
+
+    function test_AddAuthorized() public {
+        oracle.addAuthorized(authorized);
+        assertTrue(oracle.authorized(authorized));
     }
 }
 

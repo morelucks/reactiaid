@@ -16,17 +16,19 @@ contract AidVaultTest is Test {
     function test_DistributeAid() public {
         vm.prank(callbackProxy);
         
+        uint256 expectedAmount = 5 * (2 + 1) * 1e18; // 15e18
+        
         vm.expectEmit(true, false, false, true);
-        emit AidVault.AidDistributed(1, 5, "New York", 2, 0, address(vault));
+        emit AidVault.AidDistributed(1, 5, "New York", 2, expectedAmount, address(vault));
         
         vault.distributeAid(1, 5, "New York", 2);
         
-        assertEq(vault.locationFunds("New York"), 15e18);
-        assertEq(vault.totalDistributed(), 15e18);
+        assertEq(vault.locationFunds("New York"), expectedAmount);
+        assertEq(vault.totalDistributed(), expectedAmount);
     }
 
     function test_UnauthorizedCannotDistribute() public {
-        vm.expectRevert("AidVault: unauthorized");
+        vm.expectRevert("Authorized sender only");
         vm.prank(unauthorized);
         vault.distributeAid(1, 5, "New York", 2);
     }
