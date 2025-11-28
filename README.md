@@ -7,16 +7,83 @@ ReactiAid is a decentralized emergency-coordination platform that leverages **Re
 
 ---
 
-## Why ReactiAid?
 
-Traditional emergency response systems face:
+##  Problem Statement
 
-* Delays in communication
-* Centralized decision bottlenecks
-* Corruption or misallocation of relief resources
-* Lack of transparent, tamper-proof records
+Traditional emergency response systems face critical limitations:
+- **Delayed communication** between agencies and affected areas
+- **Centralized bottlenecks** in decision-making and resource allocation  
+- **Lack of transparency** in fund distribution and resource tracking
+- **Manual coordination** leading to slow response times during crises
 
-**ReactiAid** solves these using **trustless automation, open state, and reactive logic**.
+---
+
+##  Solution: ReactiAid
+
+ReactiAid leverages **Reactive Smart Contracts** to create an autonomous, transparent, and efficient emergency response coordination platform that automatically triggers aid distribution based on real-time disaster data.
+
+---
+
+## System Architecture
+
+### Smart Contract Structure
+
+| Contract | Type | Deployment Chain | Purpose |
+|----------|------|------------------|---------|
+| **DisasterOracle** | Origin | Ethereum Sepolia | Receives disaster alerts from trusted data sources |
+| **EmergencyResponse** | Reactive | **Reactive Network** | Processes disaster data and triggers cross-chain responses |
+| **AidVault** | Destination | Optimism Sepolia | Manages and distributes emergency funds/resources |
+
+### Why Reactive Contracts Are Essential
+
+This emergency response system **cannot function** without Reactive Contracts because:
+- Traditional smart contracts cannot **autonomously monitor and respond** to external disaster events
+- **Cross-chain coordination** between data sources and resource pools requires event-driven execution
+- Emergency situations demand **zero-downtime automation** without manual intervention
+- **Real-time response coordination** across multiple chains is impossible with standard smart contracts
+
+---
+
+## Technical Implementation
+
+### Core Contracts
+
+```solidity
+// DisasterOracle.sol - Origin Contract
+contract DisasterOracle {
+    event DisasterDeclared(
+        uint8 disasterType, 
+        uint256 severity, 
+        string location,
+        uint256 timestamp
+    );
+    
+    function triggerDisaster(
+        uint8 _type, 
+        uint256 _severity, 
+        string calldata _location
+    ) external onlyAuthorized {
+        emit DisasterDeclared(_type, _severity, _location, block.timestamp);
+    }
+}
+
+// EmergencyResponse.sol - Reactive Contract  
+contract EmergencyResponse {
+    enum ResponseLevel { LOW, MEDIUM, HIGH, CRITICAL }
+    
+    function onDisasterDeclared(
+        uint8 disasterType,
+        uint256 severity,
+        string memory location
+    ) external {
+        ResponseLevel level = determineResponseLevel(severity);
+        uint256 aidAmount = calculateAidAmount(level, location);
+        
+        // Trigger cross-chain aid distribution
+        CrossChainAid.dispatchResources(location, aidAmount, level);
+    }
+}
+```
 
 ---
 
