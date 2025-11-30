@@ -310,6 +310,10 @@ await walletKit.disconnectSession({
    # Reactive Network
    REACTIVE_RPC=https://rpc.reactive.network
    REACTIVE_PRIVATE_KEY=your_private_key_here
+   REACTIVE_CHAIN_ID=5318007  # 1597 for Mainnet, 5318007 for Lasna Testnet
+   
+   # Contract Verification (Sourcify)
+   SOURCIFY_VERIFIER_URL=https://sourcify.rnk.dev/
    
    # Optimism Sepolia (Destination Chain)
    OPTIMISM_SEPOLIA_RPC=https://sepolia.optimism.io
@@ -375,8 +379,11 @@ export CALLBACK_CONTRACT_ADDR=0x...
 forge script script/DeployEmergencyResponse.s.sol:DeployEmergencyResponse \
   --rpc-url $REACTIVE_RPC \
   --private-key $REACTIVE_PRIVATE_KEY \
+  --chain-id $REACTIVE_CHAIN_ID \
   --broadcast \
-  --verify
+  --verify \
+  --verifier sourcify \
+  --verifier-url $SOURCIFY_VERIFIER_URL
 ```
 
 **Expected Output:**
@@ -392,6 +399,8 @@ Severity threshold: 3
 export REACTIVE_CONTRACT_ADDR=0x...
 ```
 
+**Note:** The contract will be automatically verified on Sourcify during deployment. You can view the verified contract on Reactscan (Lasna Testnet: https://lasna.reactscan.io or Mainnet: https://reactscan.io).
+
 ### Step 4: Configure Subscription
 
 After deploying the Reactive contract, you need to set up a subscription to monitor `DisasterDeclared` events from the Origin contract. This is typically done through the Reactive Network dashboard or API.
@@ -401,6 +410,50 @@ After deploying the Reactive contract, you need to set up a subscription to moni
 - **Contract Address:** `$ORIGIN_CONTRACT_ADDR`
 - **Event Topic:** `DisasterDeclared(uint8,uint256,string,uint256,address)`
 - **Reactive Contract:** `$REACTIVE_CONTRACT_ADDR`
+
+---
+
+## 🔍 Contract Verification
+
+### Verify After Deployment
+
+If you need to verify a contract after deployment, use the following command:
+
+```bash
+forge verify-contract \
+  --verifier sourcify \
+  --verifier-url $SOURCIFY_VERIFIER_URL \
+  --chain-id $REACTIVE_CHAIN_ID \
+  $CONTRACT_ADDR $CONTRACT_NAME
+```
+
+**Example:**
+```bash
+forge verify-contract \
+  --verifier sourcify \
+  --verifier-url https://sourcify.rnk.dev/ \
+  --chain-id 5318007 \
+  0xYourContractAddress EmergencyResponse
+```
+
+### View Verified Contracts on Reactscan
+
+After verification, view your contract on Reactscan:
+
+1. Navigate to the appropriate Reactscan:
+   - **Lasna Testnet:** https://lasna.reactscan.io
+   - **Reactive Mainnet:** https://reactscan.io
+2. Search for your contract address
+3. Click on the contract and open the "Contract" tab
+4. You should see:
+   - **Status:** VERIFIED (EXACT MATCH)
+   - **Compiler:** Version used
+   - Full source code with syntax highlighting
+
+### Reactive Network Chain IDs
+
+- **Reactive Mainnet:** Chain ID `1597`
+- **Lasna Testnet:** Chain ID `5318007`
 
 ---
 
