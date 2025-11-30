@@ -10,30 +10,25 @@
 - **Status**: ✅ Deployed & Verified
 - **Explorer**: https://sepolia.basescan.org/address/0xaEC3257524637d1B5Aa02CbFA0ADF9b064Fd281e
 
-## ⏳ Pending Deployments
-
 ### AidVault (Destination Contract)
-- **Target Chain**: Base Sepolia
-- **Status**: ⏳ Waiting for callback proxy address
-- **Required**: `DESTINATION_CALLBACK_PROXY_ADDR` (Reactive Network callback proxy for Base Sepolia)
-- **Deployment Command**:
-  ```bash
-  cd contracts
-  source .env
-  forge script script/DeployAidVault.s.sol:DeployAidVault \
-    --rpc-url https://sepolia.base.org \
-    --private-key $SEPOLIA_PRIVATE_KEY \
-    --broadcast \
-    --verify
-  ```
+- **Chain**: Base Sepolia (Chain ID: 84532)
+- **Address**: `0x85Bb445AE2a5EC84BD44e83506Ba87C5a1439600`
+- **Transaction**: `0xf06acbdc4e3bc54cee6e31ea694cf89fabafd57b9bc27362847b54f933852378`
+- **Block**: 34387909
+- **Status**: ✅ Deployed & Verified
+- **Explorer**: https://sepolia.basescan.org/address/0x85Bb445AE2a5EC84BD44e83506Ba87C5a1439600
+- **Note**: Using placeholder callback proxy address (Base Sepolia doesn't have Reactive Network callback proxy yet)
+
+## ⏳ Pending Deployments
 
 ### EmergencyResponse (Reactive Contract)
 - **Target Chain**: Reactive Network (Lasna Testnet - Chain ID: 5318007)
-- **Status**: ⏳ Waiting for AidVault deployment
+- **Status**: ⏳ Waiting for Reactive Network RPC connectivity
 - **Required**:
   - ✅ `ORIGIN_CONTRACT_ADDR`: `0xaEC3257524637d1B5Aa02CbFA0ADF9b064Fd281e`
-  - ⏳ `CALLBACK_CONTRACT_ADDR`: (AidVault address - to be deployed)
+  - ✅ `CALLBACK_CONTRACT_ADDR`: `0x85Bb445AE2a5EC84BD44e83506Ba87C5a1439600`
   - ✅ `SEVERITY_THRESHOLD`: 3
+- **Issue**: Reactive Network RPC endpoints currently unreachable
 - **Deployment Command**:
   ```bash
   cd contracts
@@ -50,20 +45,18 @@
 
 ## 📋 Next Steps
 
-1. **Get Reactive Network Callback Proxy Address**
-   - Contact Reactive Network support or check their documentation
-   - Update `.env` file: `DESTINATION_CALLBACK_PROXY_ADDR=0x...`
-
-2. **Deploy AidVault to Base Sepolia**
-   - Run the deployment command above
-   - Save the deployed address to `.env`: `CALLBACK_CONTRACT_ADDR=0x...`
-
-3. **Deploy EmergencyResponse to Reactive Network**
-   - Ensure you have REACT tokens for gas fees
+1. **Deploy EmergencyResponse to Reactive Network**
+   - Ensure you have REACT tokens for gas fees (get from REACT faucet on Sepolia)
+   - Ensure Reactive Network RPC is accessible
    - Run the deployment command above
    - Save the deployed address to `.env`: `REACTIVE_CONTRACT_ADDR=0x...`
 
-4. **Set Up Subscription**
+2. **Update Callback Proxy Address (When Available)**
+   - Base Sepolia doesn't currently have a Reactive Network callback proxy
+   - When available, update AidVault contract with correct callback proxy address
+   - Or redeploy AidVault with the correct callback proxy address
+
+3. **Set Up Subscription**
    - Configure subscription on Reactive Network to monitor `DisasterDeclared` events
    - Chain ID: 84532 (Base Sepolia)
    - Contract: `0xaEC3257524637d1B5Aa02CbFA0ADF9b064Fd281e`
