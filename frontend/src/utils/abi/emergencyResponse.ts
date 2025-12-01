@@ -1,0 +1,190 @@
+export const EMERGENCY_RESPONSE_ABI = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_originContract', type: 'address' },
+      { name: '_callbackContract', type: 'address' },
+      { name: '_severityThreshold', type: 'uint256' },
+      { name: '_cooldownPeriod', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'receive',
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    name: 'callbackContract',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'cooldownPeriod',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'coverDebt',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'isProcessed',
+    inputs: [{ name: 'disasterId', type: 'bytes32' }],
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'locationLastResponse',
+    inputs: [{ name: '', type: 'string' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'originContract',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pay',
+    inputs: [{ name: 'amount', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'processedDisasters',
+    inputs: [{ name: '', type: 'bytes32' }],
+    outputs: [
+      { name: 'processed', type: 'bool' },
+      { name: 'timestamp', type: 'uint256' },
+      { name: 'responseLevel', type: 'uint8' },
+      { name: 'severity', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'react',
+    inputs: [
+      {
+        name: 'log',
+        type: 'tuple',
+        components: [
+          { name: 'chain_id', type: 'uint256' },
+          { name: '_contract', type: 'address' },
+          { name: 'topic_0', type: 'uint256' },
+          { name: 'topic_1', type: 'uint256' },
+          { name: 'topic_2', type: 'uint256' },
+          { name: 'topic_3', type: 'uint256' },
+          { name: 'data', type: 'bytes' },
+          { name: 'block_number', type: 'uint256' },
+          { name: 'op_code', type: 'uint256' },
+          { name: 'block_hash', type: 'uint256' },
+          { name: 'tx_hash', type: 'uint256' },
+          { name: 'log_index', type: 'uint256' },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'severityThreshold',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalCallbacksTriggered',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalDisastersProcessed',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    name: 'Callback',
+    inputs: [
+      {
+        name: 'chain_id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: '_contract',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'gas_limit',
+        type: 'uint64',
+        indexed: true,
+      },
+      {
+        name: 'payload',
+        type: 'bytes',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DisasterProcessed',
+    inputs: [
+      {
+        name: 'disasterId',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'disasterType',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'severity',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'location',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'responseLevel',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'triggered',
+        type: 'bool',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+] as const;
+
+
