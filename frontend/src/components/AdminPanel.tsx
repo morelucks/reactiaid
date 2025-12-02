@@ -1,53 +1,36 @@
 // src/components/AdminPanel.tsx
 import { useState } from 'react';
-import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
-import { Settings, Shield, Activity } from 'lucide-react';
-
-// Example ABI for disaster trigger
-const DISASTER_ORACLE_ABI = [
-  {
-    "name": "triggerDisaster",
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "inputs": [
-      { "internalType": "uint8", "name": "_type", "type": "uint8" },
-      { "internalType": "uint256", "name": "_severity", "type": "uint256" },
-      { "internalType": "string", "name": "_location", "type": "string" }
-    ],
-    "outputs": []
-  }
-] as const;
+import { Settings, Shield, Activity, CheckCircle, XCircle } from 'lucide-react';
+import { useTriggerDisaster } from '../hooks/useDisasterOracle';
 
 export default function AdminPanel() {
   const [disasterType, setDisasterType] = useState('0');
   const [severity, setSeverity] = useState('5');
   const [location, setLocation] = useState('');
-  const [isPending, setIsPending] = useState(false);
-  const { address } = useAccount();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
+  
+  const {
+    trigger,
+    isConnected,
+    isPending,
+    isConfirming,
+    isSuccess,
+    hash,
+    error,
+  } = useTriggerDisaster();
 
   const handleTriggerTest = async () => {
-    if (!location || !severity || !process.env.NEXT_PUBLIC_DISASTER_ORACLE_ADDRESS || !walletClient) {
+    if (!location || !severity || !isConnected) {
       return;
     }
 
-    setIsPending(true);
     try {
-      const hash = await walletClient.writeContract({
-        address: process.env.NEXT_PUBLIC_DISASTER_ORACLE_ADDRESS as `0x${string}`,
-        abi: DISASTER_ORACLE_ABI,
-        functionName: 'triggerDisaster',
-        args: [parseInt(disasterType), BigInt(severity), location],
+      await trigger({
+        type: parseInt(disasterType),
+        severity: BigInt(severity),
+        location: location,
       });
-      
-      if (publicClient) {
-        await publicClient.waitForTransactionReceipt({ hash });
-      }
     } catch (error) {
       console.error('Failed to trigger disaster:', error);
-    } finally {
-      setIsPending(false);
     }
   };
 
@@ -105,12 +88,26 @@ export default function AdminPanel() {
 
         <button
           onClick={handleTriggerTest}
-          disabled={isPending || !location}
+          disabled={isPending || isConfirming || !location || !isConnected}
           className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
         >
           <Activity className="h-4 w-4 mr-2" />
-          {isPending ? 'Triggering...' : 'Test Emergency Trigger'}
+          {isConfirming ? 'Confirming...' : isPending ? 'Triggering...' : 'Test Emergency Trigger'}
         </button>
+
+        {error && (
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700 flex items-center">
+            <XCircle className="h-4 w-4 mr-2" />
+            Error: {error.message || 'Transaction failed'}
+          </div>
+        )}
+
+        {isSuccess && hash && (
+          <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700 flex items-center">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Transaction successful! Hash: {hash.slice(0, 10)}...
+          </div>
+        )}
       </div>
 
       <div className="mt-6 pt-4 border-t">
