@@ -1,8 +1,22 @@
 import { DollarSign, Package, Users, Truck } from 'lucide-react';
+import { useAidVault } from '../hooks/useAidVault';
+import { formatEther } from 'viem';
 
 export default function ResourcePanel() {
+  const { totalDistributed, isTotalDistributedLoading } = useAidVault(undefined);
+  
+  const formatAmount = (value: bigint | undefined) => {
+    if (!value) return '$0.00';
+    return `$${parseFloat(formatEther(value)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
   const resources = [
-    { name: 'Emergency Funds', value: '$250,000', icon: DollarSign, color: 'text-green-600' },
+    { 
+      name: 'Emergency Funds', 
+      value: isTotalDistributedLoading ? 'Loading...' : formatAmount(totalDistributed), 
+      icon: DollarSign, 
+      color: 'text-green-600' 
+    },
     { name: 'Medical Supplies', value: '1,200 units', icon: Package, color: 'text-blue-600' },
     { name: 'Response Teams', value: '45 available', icon: Users, color: 'text-purple-600' },
     { name: 'Transport Units', value: '18 vehicles', icon: Truck, color: 'text-orange-600' },
